@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center">予約一覧</h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- 予約データが1件も存在しない場合 -->
+						<div th:if="${reservationPage.isEmpty()}"
+							class="text-center py-5 bg-white rounded shadow-sm border mb-4">
+							<p class="text-muted mb-0">現在ご予約中の店舗、または過去のご予約履歴はありません。</p>
+						</div>
+
+						<!-- 予約データが存在する場合 -->
+						<div th:unless="${reservationPage.isEmpty()}"
+							class="table-responsive bg-white rounded shadow-sm p-4">
+
+							<!-- テーブル -->
+							<table class="table table-hover align-middle">
+								<!-- テーブルヘッダー -->
+								<thead class="table-light">
+									<tr>
+										<th scope="col">予約店舗名</th>
+										<th scope="col">来店日</th>
+										<th scope="col">予約時間</th>
+										<th scope="col">人数</th>
+										<th scope="col" class="text-center">操作</th>
+									</tr>
+								</thead>
+
+								<!-- テーブルボディ -->
+								<tbody>
+									<tr th:each="reservation : ${reservationPage}">
+
+										<!-- 店舗名 -->
+										<td>
+											<a th:href="@{/stores/{storeid}(storeid=${reservation.store.id})}"
+												class="text-decoration-none fw-bold text-dark"
+												th:text="${reservation.store.name}">店舗名</a>
+										</td>
+										<!-- 日付 -->
+										<td th:text="${#temporals.format(reservation.reservationDate, 'yyyy年MM月dd日')}">
+											日付</td>
+										<!-- 時間 -->
+										<td th:text="${#temporals.format(reservation.reservationTime, 'HH:mm')}">時間</td>
+										<!-- 予約人数 -->
+										<td th:text="${reservation.numberOfPeople}">予約人数</td>
+										<!-- 削除ボタン -->
+										<td class="text-center">
+											<form method="post"
+												th:action="@{/reservations/{reservationId}/delete(reservationId=${reservation.id})}"
+												th:onsubmit="return confirm('この予約をキャンセルしてもよろしいですか？');">
+
+												<button type="submit"
+													class="btn btn-link text-danger p-0 text-decoration-none small fw-bold"
+													style="font-size: 0.85rem;">キャンセル</button>
+											</form>
+										</td>
+
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- ページネーション -->
+						<div th:if="${reservationPage.getTotalPages() > 1}" class="d-flex justify-content-center mt-4">
+							<nav aria-label="予約一覧ページ">
+								<ul class="pagination">
+
+									<!-- 「前」への戻るボタン -->
+									<li class="page-item">
+										<span th:if="${reservationPage.isFirst()}"
+											class="page-link disabled text-muted border-0">前</span>
+										<a th:unless="${reservationPage.isFirst()}"
+											th:href="@{/reservations(page = ${reservationPage.getNumber() - 1})}"
+											class="page-link btn-dark border-0">前</a>
+									</li>
+
+									<!-- ページ番号のループ（1, 2, 3...） -->
+									<li th:each="i : ${#numbers.sequence(0, reservationPage.getTotalPages() - 1)}"
+										class="page-item mx-1">
+										<!-- 現在アクティブなページ番号 -->
+										<span th:if="${i == reservationPage.getNumber()}"
+											class="page-link bg-dark text-white border-0 rounded"
+											th:text="${i + 1}">1</span>
+										<!-- それ以外のページ番号へのリンク -->
+										<a th:unless="${i == reservationPage.getNumber()}"
+											th:href="@{/reservations(page = ${i})}"
+											class="page-link text-dark border-0 rounded" th:text="${i + 1}">2</a>
+									</li>
+
+									<!-- 「次」への進むボタン -->
+									<li class="page-item">
+										<span th:if="${reservationPage.isLast()}"
+											class="page-link disabled text-muted border-0">次</span>
+										<a th:unless="${reservationPage.isLast()}"
+											th:href="@{/reservations(page = ${reservationPage.getNumber() + 1})}"
+											class="page-link btn-dark border-0">次</a>
+									</li>
+								</ul>
+							</nav>
+						</div>
+
+					</div> <!-- 全体の配置閉じタグ -->
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

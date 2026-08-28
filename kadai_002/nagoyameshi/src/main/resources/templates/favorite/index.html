@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<h2 class="fw-bold mb-4 text-dark text-center">お気に入り店舗一覧</h2>
+
+				<div class="row justify-content-center gy-4">
+
+					<!-- お気に入りデータがない時 -->
+					<div th:if="${favoritePage.isEmpty()}" class="col-xl-9 col-lg-10 text-center py-5">
+						<p class="text-muted mb-0">お気に入りに登録された店舗はありません。</p>
+					</div>
+
+					<div class="col-xl-9 col-lg-10" th:each="favorite : ${favoritePage.content}">
+
+						<div class="card border-0 shadow-sm rounded p-3 h-100 position-relative">
+							<div class="row g-3 align-items-center">
+
+								<!-- 左側：店舗写真エリア -->
+								<div class="col-md-4 col-12">
+									<a th:href="@{/stores/__${favorite.store.id}__}" class="text-decoration-none">
+										<img th:if="${favorite.store.imageName != null}"
+											th:src="@{/storage/__${favorite.store.imageName}__}"
+											class="w-100 rounded img-fluid" alt="店舗画像"
+											style="height: 160px; object-fit: cover;">
+										<img th:unless="${favorite.store.imageName != null}"
+											th:src="@{/images/no-image.jpg}" class="w-100 rounded img-fluid"
+											alt="No Image" style="height: 160px; object-fit: cover;">
+									</a>
+								</div>
+
+								<!-- 右側：店舗の文字情報エリア -->
+								<div class="col-md-8 col-12 d-flex flex-column justify-content-between h-100">
+									<div>
+										<div class="d-flex justify-content-between align-items-start mb-1">
+											<!-- 店舗名（詳細画面へリンク） -->
+											<a th:href="@{/stores/__${favorite.store.id}__}"
+												class="text-decoration-none text-dark">
+												<h5 class="card-title fw-bold mb-0 text-dark"
+													th:text="${favorite.store.name}">店舗名</h5>
+											</a>
+
+											<!-- お気に入り解除ボタン -->
+											<form method="post"
+												th:action="@{/stores/__${favorite.store.id}__/favorites/delete}">
+												<button type="submit"
+													class="btn btn-link text-danger text-decoration-none p-0 fw-bold small text-nowrap">解除</button>
+											</form>
+										</div>
+
+										<!-- カテゴリ -->
+										<p class="card-text tiny text-muted mb-2" style="font-size: 0.8rem;">
+											<span th:each="cat, iterStat : ${favorite.store.categories}"
+												th:text="${cat.name} + (${iterStat.last} ? '' : ' / ')">カテゴリ名</span>
+										</p>
+
+										<!-- 住所 -->
+										<p class="card-text text-muted mb-2" style="font-size: 0.8rem;">
+											<span th:text="${favorite.store.address}">愛知県名古屋市...</span>
+										</p>
+
+										<!-- 店舗説明文 -->
+										<p class="card-text small text-secondary mb-3" style="font-size: 0.85rem;"
+											th:text="${favorite.store.description}">店舗の説明文。</p>
+									</div>
+
+									<!-- 価格帯 ＆ 住所 -->
+									<div
+										class="border-top pt-2 d-flex flex-wrap justify-content-between align-items-center gap-2">
+										<div class="small text-secondary" style="font-size: 0.8rem;">
+											<span class="fw-bold text-dark">予算: </span>
+											<span
+												th:text="${#numbers.formatInteger(favorite.store.priceLower, 1, 'COMMA')} + '円 〜 ' + ${#numbers.formatInteger(favorite.store.priceUpper, 1, 'COMMA')} + '円'">1,000円
+												〜 3,000円</span>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- ページネーション -->
+				<div th:if="${favoritePage.getTotalPages() > 1}" class="d-flex justify-content-center mt-4">
+					<nav aria-label="お気に入り一覧ページ">
+						<ul class="pagination">
+
+							<!-- 「前」へ戻るボタン -->
+							<li class="page-item">
+								<span th:if="${favoritePage.isFirst()}"
+									class="page-link disabled text-muted border-0">前</span>
+								<a th:unless="${favoritePage.isFirst()}"
+									th:href="@{/favorites(page = ${favoritePage.getNumber() - 1})}"
+									class="page-link btn-dark border-0">前</a>
+							</li>
+
+							<!-- ページ番号のループ -->
+							<li th:each="i : ${#numbers.sequence(0, favoritePage.getTotalPages() - 1)}"
+								class="page-item mx-1">
+								<span th:if="${i == favoritePage.getNumber()}"
+									class="page-link bg-dark text-white border-0 rounded" th:text="${i + 1}">1</span>
+								<a th:unless="${i == favoritePage.getNumber()}" th:href="@{/favorites(page = ${i})}"
+									class="page-link text-dark border-0 rounded" th:text="${i + 1}">2</a>
+							</li>
+
+							<!-- 「次」へ進むボタン -->
+							<li class="page-item">
+								<span th:if="${favoritePage.isLast()}"
+									class="page-link disabled text-muted border-0">次</span>
+								<a th:unless="${favoritePage.isLast()}"
+									th:href="@{/favorites(page = ${favoritePage.getNumber() + 1})}"
+									class="page-link btn-dark border-0">次</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

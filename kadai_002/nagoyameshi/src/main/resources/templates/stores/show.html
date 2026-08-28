@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<div th:if="${successMessage}" class="alert alert-info text-center mb-4">
+					<span th:text="${successMessage}">レビューを削除しました。</span>
+				</div>
+
+				<!-- 店舗名 -->
+				<h2 class="fw-bold mb-4 text-dark text-center" th:text="${store.name}">店舗詳細</h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- お気に入りボタン -->
+						<div class="text-end mb-2">
+							<!-- 有料会員の場合 -->
+							<div sec:authorize="hasRole('ROLE_PREMIUM')">
+								<!-- 未登録の時 -->
+								<form th:if="${!hasFavorite}" method="post"
+									th:action="@{/stores/__${store.id}__/favorites/create}">
+									<input type="hidden" name="from" value="show">
+									<button type="submit" class="btn btn-link p-0 text-decoration-none small fw-bold"
+										style="font-size: 0.85rem; color: #0097a7;">♡ お気に入り</button>
+								</form>
+								<!-- 登録済みの時 -->
+								<form th:if="${hasFavorite}" method="post"
+									th:action="@{/stores/__${store.id}__/favorites/delete}">
+									<input type="hidden" name="from" value="show">
+									<button type="submit"
+										class="btn btn-link p-0 text-decoration-none small fw-bold text-danger"
+										style="font-size: 0.85rem;">♥ お気に入り解除</button>
+								</form>
+							</div>
+
+							<!-- 無料会員の場合 -->
+							<div sec:authorize="hasRole('ROLE_FREE')">
+								<a th:href="@{/subscription/register}"
+									class="btn btn-outline-secondary px-3 py-1 shadow-sm rounded-pill fw-bold btn-sm text-muted">
+									♡ 有料会員限定
+								</a>
+							</div>
+						</div>
+
+						<!-- メイン画像 -->
+						<div class="mb-4">
+							<img th:if="${store.imageName != null}" th:src="@{/storage/__${store.imageName}__}"
+								class="w-100 rounded shadow-sm" alt="店舗画像"
+								style="max-height: 400px; object-fit: cover;">
+							<img th:unless="${store.imageName != null}" th:src="@{/images/no-image.jpg}"
+								class="w-100 rounded shadow-sm" alt="No Image"
+								style="max-height: 400px; object-fit: cover;">
+						</div>
+
+						<!-- 詳細情報テーブル -->
+						<div class="mb-4">
+							<table class="table table-bordered shadow-sm bg-white align-middle">
+								<tbody>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small"
+											style="width: 25%;">価格帯</th>
+										<td
+											th:text="${#numbers.formatInteger(store.priceLower, 1, 'COMMA')} + '円 〜 ' + ${#numbers.formatInteger(store.priceUpper, 1, 'COMMA')} + '円'">
+											1,000円 〜 3,000円</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">営業時間</th>
+										<td
+											th:text="${#temporals.format(store.hoursOpen, 'HH:mm')} + ' 〜 ' + ${#temporals.format(store.hoursClose, 'HH:mm')}">
+											17:00 〜 23:00</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">定休日</th>
+										<td th:text="${store.regularHoliday}">火曜日</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">郵便番号</th>
+										<td th:text="'〒' + ${store.postalCode}">〒460-0008</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">住所</th>
+										<td th:text="${store.address}">愛知県名古屋市...</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">電話番号</th>
+										<td th:text="${store.phoneNumber}">052-123-4567</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">店舗説明</th>
+										<td th:text="${store.description}">店舗の説明文</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- 予約のリンク -->
+						<div class="text-center mb-4">
+							<div sec:authorize="hasRole('ROLE_PREMIUM')">
+								<a th:href="@{/stores/__${store.id}__/reservations/register}"
+									class="btn btn-outline-dark btn-sm px-4 rounded-pill shadow-sm">予約する</a>
+							</div>
+							<div sec:authorize="hasRole('ROLE_FREE')">
+								<a th:href="@{/subscription/register}"
+									class="btn btn-warning btn-sm px-4 rounded-pill shadow-sm text-white fw-bold">
+									有料会員に登録して予約をする
+								</a>
+							</div>
+							<div sec:authorize="isAnonymous()">
+								<a th:href="@{/login}"
+									class="btn btn-secondary btn-sm px-4 rounded-pill shadow-sm text-white fw-bold">
+									ログインして予約する
+								</a>
+							</div>
+						</div>
+
+						<!-- レビュー -->
+						<hr class="my-5">
+
+						<div class="mb-4">
+							<h4 class="fw-bold mb-4 text-center ">レビュー</h4>
+
+							<!-- レビューが1件も存在しない場合 -->
+							<div th:if="${reviewPage.isEmpty()}"
+								class="text-center py-4 bg-white rounded shadow-sm border mb-4">
+								<p class="text-muted mb-0">まだレビューはありません。</p>
+							</div>
+
+							<!-- レビューが存在する場合 -->
+							<div th:unless="${reviewPage.isEmpty()}" class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+								<div th:each="review : ${reviewPage.content}" class="col">
+									<div class="card h-100 shadow-sm border-0 bg-white">
+										<div class="card-body p-4">
+											<div class="d-flex justify-content-between align-items-center mb-2">
+												<!-- ユーザー情報 -->
+												<h6 class="fw-bold mb-0 text-dark" th:text="${review.user.name}">会員ユーザー
+												</h6>
+
+												<!-- スコア -->
+												<span class="text-warning fw-bold small"
+													th:text="${'★'.repeat(review.score)}">★★★★★</span>
+											</div>
+
+											<!-- 口コミ -->
+											<p class="card-text text-secondary lh-base mb-0 small"
+												th:text="${review.comment}">ここにレビュー本文が動的に入ります。</p>
+
+											<div class="d-flex justify-content-end gap-2"
+												sec:authorize="hasRole('ROLE_PREMIUM')">
+												<th:block
+													th:if="${#authentication.principal.user.id == review.user.id}">
+													<!-- 編集ボタン -->
+													<a th:href="@{/stores/{storeId}/reviews/{reviewId}/edit(storeId=${store.id}, reviewId=${review.id})}"
+														class="btn btn-link p-0 text-decoration-none small"
+														style="font-size: 0.8rem;">編集</a>
+
+													<!-- 削除ボタン（モーダル呼び出し用） -->
+													<a href="#"
+														class="btn btn-link p-0 text-decoration-none small text-danger"
+														style="font-size: 0.8rem;" data-bs-toggle="modal"
+														th:data-bs-target="${'#deleteReviewModal' + review.id}">削除</a>
+												</th:block>
+											</div>
+
+										</div>
+									</div>
+									<!-- 削除確認用モーダル -->
+									<div class="modal fade" th:id="${'deleteReviewModal' + review.id}" tabindex="-1"
+										aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered">
+											<div class="modal-content">
+
+												<!-- モーダルのヘッダー（タイトル） -->
+												<div class="modal-header">
+													<h5 class="modal-title fw-bold">レビュー削除確認</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal"
+														aria-label="閉じる"></button>
+												</div>
+
+												<!-- モーダルの本文（確認メッセージ） -->
+												<div class="modal-body text-start">
+													<p class="mb-0 small text-secondary">以下のレビューを完全に削除しますか？この操作は取り消せません。
+													</p>
+													<blockquote
+														class="blockquote bg-light p-3 rounded mt-2 border-start border-danger border-3 small">
+														<p class="mb-0 text-dark lh-base" th:text="${review.comment}">
+															ここに削除対象のレビュー本文が動的に入ります。</p>
+													</blockquote>
+												</div>
+
+												<!-- キャンセルボタン -->
+												<div class="modal-footer">
+													<button type="button"
+														class="btn btn-secondary btn-sm rounded-pill px-3"
+														data-bs-dismiss="modal">キャンセル</button>
+
+													<!-- 削除ボタン -->
+													<form
+														th:action="@{/stores/{storeId}/reviews/{reviewId}/delete(storeId=${store.id}, reviewId=${review.id}, from='show')}"
+														method="post">
+														<button type="submit"
+															class="btn btn-dark btn-sm rounded-pill px-3">本当に削除する</button>
+													</form>
+												</div>
+
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- 会員種別によるレビュー導線 -->
+							<div class="text-center mb-4">
+								<!-- 有料会員（ROLE_PREMIUM）だけに表示 -->
+								<div sec:authorize="hasRole('ROLE_PREMIUM')" th:unless="${reviewPage.isEmpty()}">
+									<a th:href="@{/stores/{storeId}/reviews(storeId=${store.id})}"
+										class="btn btn-outline-dark btn-sm px-4 rounded-pill shadow-sm">
+										すべてのレビューを見る（全[[${reviewPage.totalElements}]]件）
+									</a>
+								</div>
+								<!-- 無料会員（ROLE_FREE）だけに表示 -->
+								<div sec:authorize="hasRole('ROLE_FREE')">
+									<p class="text-muted small mb-2">※月額300円の有料会員に登録すると、すべてのレビュー閲覧・投稿が可能になります。</p>
+									<a th:href="@{/subscription/register}"
+										class="btn btn-warning btn-sm px-4 rounded-pill shadow-sm text-white fw-bold">
+										有料会員に登録してレビューを見る
+									</a>
+								</div>
+								<!-- 未ログイン -->
+								<div sec:authorize="isAnonymous()">
+									<p class="text-muted small mb-2">※レビューの閲覧・投稿にはログインおよび有料会員への登録が必要です。</p>
+									<a th:href="@{/login}"
+										class="btn btn-secondary btn-sm px-4 rounded-pill shadow-sm text-white fw-bold">
+										ログインしてレビューを見る
+									</a>
+								</div>
+							</div>
+
+						</div><!-- レビュー閉じタグ -->
+
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

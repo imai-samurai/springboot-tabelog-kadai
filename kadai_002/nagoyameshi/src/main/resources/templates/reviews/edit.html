@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center" th:text="|${store.name}のレビューを編集する|"></h2>
+
+				<!-- 投稿用フォーム -->
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+						<div class="card border-0 shadow-sm">
+							<div class="card-body p-4 p-md-5">
+
+								<!-- フォームの設定 -->
+								<form method="post"
+									th:action="@{/stores/__${store.id}__/reviews/__${reviewEditForm.id}__/update}"
+									th:object="${reviewEditForm}">
+
+									<input type="hidden" th:field="*{id}">
+
+									<!-- スコア -->
+									<div class="form-group mb-3">
+										<label for="score" class="form-label fw-bold">評価（5段階）</label>
+										<div th:if="${#fields.hasErrors('score')}" class="text-danger small mb-2"
+											th:errors="*{score}"></div>
+										<!-- セレクトボックス -->
+										<select id="score" th:field="*{score}" class="form-select text-warning fw-bold">
+											<option value="5">★★★★★ (5)</option>
+											<option value="4">★★★★☆ (4)</option>
+											<option value="3">★★★☆☆ (3)</option>
+											<option value="2">★★☆☆☆ (2)</option>
+											<option value="1">★☆☆☆☆ (1)</option>
+										</select>
+									</div>
+
+									<!-- コメント -->
+									<div class="form-group mb-4">
+										<label for="comment" class="form-label fw-bold">コメント</label>
+										<div th:if="${#fields.hasErrors('comment')}" class="text-danger small mb-2"
+											th:errors="*{comment}"></div>
+										<!-- テキストエリア -->
+										<textarea id="comment" th:field="*{comment}" class="form-control" rows="6"
+											placeholder="お店の感想を記入してください（空欄禁止）"></textarea>
+									</div>
+
+									<!-- 投稿ボタン -->
+									<div class="form-group d-flex justify-content-center border-top pt-4">
+										<button type="submit"
+											class="btn btn-dark text-white shadow-sm w-50">編集する</button>
+									</div>
+								</form>
+
+							</div>
+						</div>
+
+					</div>　<!-- 全体配置の閉じタグ -->
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

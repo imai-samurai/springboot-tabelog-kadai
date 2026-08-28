@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<!-- メイン写真 -->
+			<div class="nagoyameshi-hero mb-3 d-flex align-items-center justify-content-center"
+				th:style="'background-image: url(' + @{/storage/main_visual.jpg} + ');'">
+				<div class="text-center text-white">
+					<h1 class="display-3 fw-bold tracking-wider mb-2">NAGOYAMESHI</h1>
+					<p class="lead">名古屋の特別な「美味しい」を見つけよう</p>
+				</div>
+			</div>
+
+			<!-- リダイレクト時のメッセージ -->
+			<div class="container py-2 samuraitravel-container">
+				<div th:if="${param.loggedIn}" class="alert alert-info">
+					ログインしました。
+				</div>
+				<div th:if="${param.loggedOut}" class="alert alert-info">
+					ログアウトしました。
+				</div>
+				<div th:if="${successMessage}" class="alert alert-info">
+					<span th:text="${successMessage}"></span>
+				</div>
+			</div>
+
+			<!-- 新着5件表示 -->
+			<div class="container nagoyameshi-container pb-5">
+				<!-- 店舗名キーワード検索窓 -->
+				<div class="row mb-4 justify-content-start">
+					<div class="col-md-5">
+						<form method="get" th:action="@{/stores}">
+							<div class="input-group input-group-lg shadow-sm rounded">
+								<input type="text" name="keyword" th:value="${keyword}"
+									class="form-control border-0 px-3 text-dark" placeholder="店舗名で検索...">
+								<input type="hidden" name="order" th:value="${order}">
+								<button class="btn btn-dark border-0 px-3" type="submit">検索</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<h2 class="text-center fw-bold mb-4 text-dark">新着の店舗</h2>
+
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-4">
+					<div class="col" th:each="store : ${stores}">
+						<a th:href="@{/stores/__${store.id}__}" class="text-decoration-none h-100 d-block">
+							<div class="card h-100 border-0 shadow-sm rounded">
+
+								<!-- 店舗画像エリア -->
+								<img th:if="${store.imageName}" th:src="@{/storage/__${store.imageName}__}"
+									class="card-img-top rounded-top" alt="店舗画像"
+									style="height: 180px; object-fit: cover;">
+								<img th:unless="${store.imageName}" th:src="@{/images/no_image.png}"
+									class="card-img-top rounded-top" alt="NO IMAGE"
+									style="height: 180px; object-fit: cover;">
+
+								<!-- カードのテキスト部分 -->
+								<div class="card-body d-flex flex-column text-dark">
+									<!-- 店舗名 -->
+									<h5 class="card-title fw-bold mb-1 small" th:text="${store.name}">店舗名</h5>
+
+									<!-- カテゴリ名 -->
+									<p class="card-text tiny text-muted mb-2" style="font-size: 0.8rem;">
+										<span th:each="cat, iterStat : ${store.categories}"
+											th:text="${cat.name} + (${iterStat.last} ? '' : ' / ')">カテゴリ名</span>
+									</p>
+
+									<!-- 店舗説明 -->
+									<p class="card-text small text-secondary flex-grow-1" style="font-size: 0.85rem;"
+										th:text="${store.description}">店舗の説明文。</p>
+
+									<!-- 価格帯 -->
+									<div class="border-top pt-2 mt-2">
+										<span class="fw-bold" style="font-size: 0.8rem;">予算: </span>
+										<span style="font-size: 0.8rem;"
+											th:text="${#numbers.formatInteger(store.priceLower, 1, 'COMMA')} + '円〜'">1,000円〜</span>
+									</div>
+
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+
+		</main>
+
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

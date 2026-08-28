@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- スタイル部品を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>会員情報編集 - NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-5 pb-5 nagoyameshi-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+
+						<h2 class="mb-4 text-center fw-bold text-dark">会員情報の編集</h2>
+
+						<!-- 会員登録フォーム（SignupFormと連動） -->
+						<form method="post" th:action="@{/user/update}" th:object="${userEditForm}">
+
+							<!-- 氏名入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="name" class="col-form-label text-md-left fw-bold small">
+										<div class="d-flex align-items-center">
+											<span class="me-1">氏名</span>
+											<span class="badge bg-danger">必須</span>
+										</div>
+									</label>
+								</div>
+								<div class="col-md-7">
+									<div th:if="${#fields.hasErrors('name')}" class="text-danger small mb-2"
+										th:errors="*{name}"></div>
+									<input type="text" class="form-control rounded" th:field="*{name}"
+										autocomplete="name">
+								</div>
+							</div>
+
+							<!-- フリガナ入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="furi" class="col-form-label text-md-left fw-bold small">
+										<div class="d-flex align-items-center">
+											<span class="me-1">フリガナ</span>
+											<span class="badge bg-danger">必須</span>
+										</div>
+									</label>
+								</div>
+								<div class="col-md-7">
+									<div th:if="${#fields.hasErrors('furi')}" class="text-danger small mb-2"
+										th:errors="*{furi}"></div>
+									<input type="text" class="form-control rounded" th:field="*{furi}">
+								</div>
+							</div>
+
+							<!-- メールアドレス入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="email" class="col-form-label text-md-left fw-bold small">
+										<div class="d-flex align-items-center">
+											<span class="me-1">メールアドレス</span>
+											<span class="badge bg-danger">必須</span>
+										</div>
+									</label>
+								</div>
+								<div class="col-md-7">
+									<div th:if="${#fields.hasErrors('email')}" class="text-danger small mb-2"
+										th:errors="*{email}"></div>
+									<input type="text" class="form-control rounded" th:field="*{email}"
+										autocomplete="email">
+								</div>
+							</div>
+
+							<!-- 編集ボタン -->
+							<div class="form-group d-flex justify-content-center mt-5 my-4">
+								<button type="submit"
+									class="btn btn-dark px-4 shadow-sm rounded-pill fw-bold">編集</button>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター部品を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- JavaScript部品を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

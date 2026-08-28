@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<div th:if="${successMessage}" class="alert alert-info text-center mb-4">
+					<span th:text="${successMessage}">レビューを削除しました。</span>
+				</div>
+
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center" th:text="|${store.name}のレビュー一覧|"></h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- 新規投稿ボタン -->
+						<div class="text-center mb-4">
+							<a th:href="@{/stores/{storeId}/reviews/register(storeId=${store.id})}"
+								class="btn btn-dark btn-sm px-4 rounded-pill shadow-sm fw-bold">新しいレビューを投稿する</a>
+						</div>
+
+						<div th:if="${reviewPage.isEmpty()}"
+							class="text-center py-5 bg-white rounded shadow-sm border mb-4">
+							<p class="text-muted mb-0">まだレビューはありません。</p>
+						</div>
+
+						<!-- レビュー表示エリア -->
+						<div th:unless="${reviewPage.isEmpty()}" class="row row-cols-1 g-3 mb-4">
+							<div th:each="review : ${reviewPage.content}" class="col">
+								<div class="card shadow-sm border-0 bg-white">
+									<div class="card-body p-4">
+
+										<!-- 投稿者名とスコア -->
+										<div class="d-flex justify-content-between align-items-center mb-2">
+											<!-- 会員ユーザー名 -->
+											<h6 th:text="${review.user.name}" class="fw-bold mb-0 text-dark">会員ユーザー名
+											</h6>
+
+											<!-- スコア -->
+											<span th:text="${'★'.repeat(review.score)}"
+												class="text-warning fw-bold small">★★★★★</span>
+										</div>
+
+										<!-- 口コミ本文 -->
+										<p th:text="${review.comment}"
+											class="card-text text-secondary lh-base mb-2 small">ここにレビュー本文が動的に入ります。</p>
+
+										<!-- 本人限定の編集・削除ボタンエリア -->
+										<div class="d-flex justify-content-end gap-2"
+											th:if="${#authentication.principal.user.id == review.user.id}">
+
+											<!-- 編集ボタン -->
+											<a th:href="@{/stores/{storeId}/reviews/{reviewId}/edit(storeId=${store.id}, reviewId=${review.id})}"
+												class="btn btn-link p-0 text-decoration-none small"
+												style="font-size: 0.8rem;">⚙️ 編集</a>
+
+											<!-- 削除ボタン -->
+											<a href="#" class="btn btn-link p-0 text-decoration-none small text-danger"
+												style="font-size: 0.8rem;" data-bs-toggle="modal"
+												th:data-bs-target="${'#deleteReviewModal' + review.id}">🗑️ 削除</a>
+										</div>
+
+									</div>
+								</div>
+								<!-- 削除確認用モーダル -->
+								<div class="modal fade" th:id="${'deleteReviewModal' + review.id}" tabindex="-1"
+									aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered">
+										<div class="modal-content">
+
+											<!-- モーダルのヘッダー（タイトル） -->
+											<div class="modal-header">
+												<h5 class="modal-title fw-bold">レビュー削除確認</h5>
+												<button type="button" class="btn-close" data-bs-dismiss="modal"
+													aria-label="閉じる"></button>
+											</div>
+
+											<!-- モーダルの本文（確認メッセージ） -->
+											<div class="modal-body text-start">
+												<p class="mb-0 small text-secondary">以下のレビューを完全に削除しますか？この操作は取り消せません。</p>
+												<blockquote
+													class="blockquote bg-light p-3 rounded mt-2 border-start border-danger border-3 small">
+													<p class="mb-0 text-dark lh-base" th:text="${review.comment}">
+														ここに削除対象のレビュー本文が動的に入ります。</p>
+												</blockquote>
+											</div>
+
+											<!-- モーダルのフッター（キャンセルと本当に削除するボタン） -->
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary btn-sm rounded-pill px-3"
+													data-bs-dismiss="modal">キャンセル</button>
+
+												<form
+													th:action="@{/stores/{storeId}/reviews/{reviewId}/delete(storeId=${store.id}, reviewId=${review.id})}"
+													method="post">
+													<button type="submit"
+														class="btn btn-dark btn-sm rounded-pill px-3">本当に削除する</button>
+												</form>
+											</div>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- ページネーション -->
+						<div th:if="${reviewPage.getTotalPages() > 1}" class="d-flex justify-content-center mt-4">
+							<nav aria-label="レビュー 一覧ページ">
+								<ul class="pagination">
+
+									<!-- 「前」への戻るボタン -->
+									<li class="page-item">
+										<span th:if="${reviewPage.isFirst()}"
+											class="page-link disabled text-muted border-0">前</span>
+										<a th:unless="${reviewPage.isFirst()}"
+											th:href="@{/stores/{storeId}/reviews(storeId=${store.id}, page=${reviewPage.getNumber() - 1})}"
+											class="page-link btn-dark border-0">前</a>
+									</li>
+
+									<!-- 各ページ移動 -->
+									<li th:each="i : ${#numbers.sequence(0, reviewPage.getTotalPages() - 1)}"
+										class="page-item mx-1">
+										<!-- 現在アクティブなページ番号 -->
+										<span th:if="${i == reviewPage.getNumber()}"
+											class="page-link bg-dark text-white border-0 rounded"
+											th:text="${i + 1}">1</span>
+										<!-- それ以外のページ番号へのリンク -->
+										<a th:unless="${i == reviewPage.getNumber()}"
+											th:href="@{/stores/{storeId}/reviews(storeId=${store.id}, page = ${i})}"
+											class="page-link text-dark border-0 rounded" th:text="${i + 1}">2</a>
+									</li>
+
+									<!-- 「次」への進むボタン -->
+									<li class="page-item">
+										<span th:if="${reviewPage.isLast()}"
+											class="page-link disabled text-muted border-0">次</span>
+										<a th:unless="${reviewPage.isLast()}"
+											th:href="@{/stores/{storeId}/reviews(storeId=${store.id}, page=${reviewPage.getNumber() + 1})}"
+											class="page-link btn-dark border-0">次</a>
+									</li>
+								</ul>
+							</nav>
+						</div> <!-- ページネーション閉じタグ -->
+
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center">店舗一覧</h2>
+
+				<!-- 店舗名キーワード検索窓 -->
+				<div class="row mb-4 justify-content-start">
+					<div class="col-md-5">
+						<form method="get" th:action="@{/stores}">
+							<div class="input-group input-group-lg shadow-sm rounded">
+								<input type="text" name="keyword" th:value="${keyword}"
+									class="form-control border-0 px-3 text-dark" placeholder="店舗名で検索...">
+								<input type="hidden" name="order" th:value="${order}">
+								<button class="btn btn-dark border-0 px-3" type="submit">検索</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="row mb-4 g-3">
+					<!-- 左半分：予算での絞り込み -->
+					<div class="col-md-5 col-lg-4">
+						<form method="get" th:action="@{/stores}">
+							<div class="d-flex gap-2">
+								<select name="price" class="form-select border-0 shadow-sm px-3 text-dark">
+									<option value="">全ての予算（上限なし）</option>
+									<option value="1000" th:selected="${price == 1000}">1,000円以下</option>
+									<option value="2000" th:selected="${price == 2000}">2,000円以下</option>
+									<option value="3000" th:selected="${price == 3000}">3,000円以下</option>
+									<option value="5000" th:selected="${price == 5000}">5,000円以下</option>
+									<option value="10000" th:selected="${price == 10000}">10,000円以下</option>
+								</select>
+								<input type="hidden" name="order" th:value="${order}">
+								<button class="btn btn-dark btn-sm border-0 px-3 text-nowrap" type="submit">適用</button>
+							</div>
+						</form>
+					</div>
+
+					<!-- 右半分：カテゴリ絞り込み -->
+					<div class="col-md-5 col-lg-4">
+						<form method="get" th:action="@{/stores}">
+							<div class="d-flex gap-2">
+								<select name="categoryId" class="form-select border-0 shadow-sm px-3 text-dark">
+									<option value="">全てのカテゴリ</option>
+									<option th:each="category : ${categories}" th:value="${category.id}"
+										th:text="${category.name}" th:selected="${category.id == categoryId}">焼肉
+									</option>
+								</select>
+								<button class="btn btn-dark btn-sm border-0 px-3 text-nowrap" type="submit">検索</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<!-- 価格：並び替えセレクトボックス -->
+				<div class="row mb-4 justify-content-end">
+					<div class="col-md-3">
+						<form method="get" th:action="@{/stores}" id='orderForm'>
+							<div class="input-group input-group-sm shadow-sm rounded">
+								<span class="input-group-text bg-dark text-white border-0 small">並び替え</span>
+								<select name="order" class="form-select border-0 text-dark"
+									onchange="document.getElementById('orderForm').submit();">
+									<option value="" th:selected="${order == null || order == ''}">標準（登録順）</option>
+									<option value="priceAsc" th:selected="${order == 'priceAsc'}">価格が安い順</option>
+									<option value="priceDesc" th:selected="${order == 'priceDesc'}">価格が高い順</option>
+								</select>
+								<input th:if="${keyword}" type="hidden" name="keyword" th:value="${keyword}">
+								<input th:if="${price}" type="hidden" name="price" th:value="${price}">
+								<input th:if="${categoryId}" type="hidden" name="categoryId" th:value="${categoryId}">
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<!-- 一店舗のカード -->
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+					<div class="col" th:each="store : ${storePage.content}">
+						<a th:href="@{/stores/__${store.id}__}" class="text-decoration-none h-100 d-block">
+							<div class="card h-100 border-0 shadow-sm rounded">
+								<!-- 写真 -->
+								<img th:if="${store.imageName}" th:src="@{/storage/__${store.imageName}__}"
+									class="card-img-top rounded-top" alt="店舗画像"
+									style="height: 200px; object-fit: cover;">
+								<!-- 万が一、画像が登録されていない場合のダミー画像 -->
+								<img th:unless="${store.imageName}" th:src="@{/images/no_image.png}"
+									class="card-img-top rounded-top" alt="NO IMAGE"
+									style="height: 200px; object-fit: cover;">
+
+								<!-- カードのテキスト部分 -->
+								<div class="card-body d-flex flex-column text-dark">
+									<!-- 店舗名 -->
+									<h5 class="card-title fw-bold mb-1" th:text="${store.name}">店舗名</h5>
+
+									<!-- 複数カテゴリ名 -->
+									<p class="card-text tiny text-muted mb-2" style="font-size: 0.8rem;">
+										<span th:each="cat, iterStat : ${store.categories}"
+											th:text="${cat.name} + (${iterStat.last} ? '' : ' / ')">カテゴリ名</span>
+									</p>
+
+									<!-- 店舗説明 -->
+									<p class="card-text small text-secondary flex-grow-1" style="font-size: 0.85rem;"
+										th:text="${store.description}">店舗の説明文。</p>
+
+									<!-- 価格帯 -->
+									<div class="border-top pt-2 mt-2">
+										<span class="fw-bold" style="font-size: 0.8rem;">予算: </span>
+										<span style="font-size: 0.8rem;"
+											th:text="${#numbers.formatInteger(store.priceLower, 1, 'COMMA')} + '円 〜 ' + ${#numbers.formatInteger(store.priceUpper, 1, 'COMMA')} + '円'">1,000円
+											〜 3,000円</span>
+									</div>
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+
+				<!-- ページネーション -->
+				<div th:if="${storePage.getTotalPages() > 1}" class="d-flex justify-content-center mt-4">
+					<nav aria-label="店舗一覧ページ">
+						<ul class="pagination">
+
+							<!-- 「前」への戻るボタン -->
+							<li class="page-item">
+								<span th:if="${storePage.isFirst()}"
+									class="page-link disabled text-muted border-0">前</span>
+								<a th:unless="${storePage.isFirst()}"
+									th:href="@{/stores(page = ${storePage.getNumber() - 1}, keyword = ${keyword}, price = ${price}, categoryId = ${categoryId}, order = ${order})}"
+									class="page-link btn-dark border-0">前</a>
+							</li>
+
+							<!-- ページ番号のループ（1, 2, 3...） -->
+							<li th:each="i : ${#numbers.sequence(0, storePage.getTotalPages() - 1)}"
+								class="page-item mx-1">
+								<!-- 現在アクティブなページ番号 -->
+								<span th:if="${i == storePage.getNumber()}"
+									class="page-link bg-dark text-white border-0 rounded" th:text="${i + 1}">1</span>
+								<!-- それ以外のページ番号へのリンク -->
+								<a th:unless="${i == storePage.getNumber()}"
+									th:href="@{/stores(page = ${i}, keyword = ${keyword}, price = ${price}, categoryId = ${categoryId}, order = ${order})}"
+									class="page-link text-dark border-0 rounded" th:text="${i + 1}">2</a>
+							</li>
+
+							<!-- 「次」への進むボタン -->
+							<li class="page-item">
+								<span th:if="${storePage.isLast()}"
+									class="page-link disabled text-muted border-0">次</span>
+								<a th:unless="${storePage.isLast()}"
+									th:href="@{/stores(page = ${storePage.getNumber() + 1}, keyword = ${keyword}, price = ${price}, categoryId = ${categoryId}, order = ${order})}"
+									class="page-link btn-dark border-0">次</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

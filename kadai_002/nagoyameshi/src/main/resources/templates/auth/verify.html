@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- スタイル部品を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>会員登録 - NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-5 pb-5 nagoyameshi-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+
+						<div th:if="${successMessage}" class="alert alert-info">
+							<span th:text="${successMessage}"></span>
+						</div>
+
+						<div th:if="${errorMessage}" class="alert alert-danger">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター部品を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- JavaScript部品を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

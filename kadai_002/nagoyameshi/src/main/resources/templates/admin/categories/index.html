@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI ADMIN</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<div th:if="${successMessage}" class="alert alert-info text-center mb-4">
+					<span th:text="${successMessage}"></span>
+				</div>
+
+				<!-- 店舗名 -->
+				<h2 class="fw-bold mb-4 text-dark text-center">カテゴリ一覧</h2>
+
+				<!-- 新規店舗登録ボタン -->
+				<div class="text-center mb-4">
+					<a th:href="@{/admin/categories/register}"
+						class="btn btn-dark btn-sm px-4 rounded-pill shadow-sm fw-bold">新しくカテゴリを登録する</a>
+				</div>
+
+				<!-- カテゴリ名キーワード検索窓 -->
+				<div class="row mb-4 justify-content-start">
+					<div class="col-md-5">
+						<form method="get" th:action="@{/admin/categories}">
+							<div class="input-group input-group-lg shadow-sm rounded">
+								<input type="text" name="keyword" th:value="${keyword}"
+									class="form-control border-0 px-3 text-dark" placeholder="カテゴリを検索">
+								<button class="btn btn-dark border-0 px-3" type="submit">検索</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="row justify-content-center">
+
+					<!-- 会員データが空ではない場合 -->
+					<div th:unless="${categories.isEmpty()}"
+						class="table-responsive bg-white rounded shadow-sm p-4 mb-4">
+						<table class="table table-hover align-middle">
+							<thead class="table-light">
+								<tr class="text-dark">
+									<th scope="col" class="fw-bold small">ID</th>
+									<th scope="col" class="fw-bold small">カテゴリ名</th>
+									<th scope="col" class="fw-bold small">登録日</th>
+									<th scope="col" class="fw-bold small">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="category : ${categories}" class="text-secondary small">
+									<!-- ID -->
+									<td th:text="${category.id}" class="fw-bold text-dark"></td>
+
+									<!-- カテゴリ名 -->
+									<td th:text="${category.name}" class="text-dark"></td>
+
+									<!-- 登録日 -->
+									<td th:text="${#dates.format(category.createdAt, 'yyyy年MM月dd日')}"></td>
+
+									<!-- 編集・削除 -->
+									<td>
+										<!-- 編集ボタン -->
+										<a th:href="@{/admin/categories/{categoryId}/edit(categoryId=${category.id})}"
+											class="btn btn-link p-0 text-decoration-none small"
+											style="font-size: 0.8rem;">編集</a>
+
+										<!-- 削除ボタン -->
+										<a href="#" class="btn btn-link p-0 text-decoration-none small text-danger"
+											style="font-size: 0.8rem;" data-bs-toggle="modal"
+											th:data-bs-target="${'#deleteStoreModal' + category.id}">削除</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<!-- 削除確認用モーダル -->
+						<th:block th:each="category : ${categories}">
+							<div class="modal fade" th:id="${'deleteStoreModal' + category.id}" tabindex="-1"
+								aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered">
+									<div class="modal-content">
+
+										<!-- モーダルのヘッダー（タイトル） -->
+										<div class="modal-header">
+											<h5 class="modal-title fw-bold">カテゴリ削除確認</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal"
+												aria-label="閉じる"></button>
+										</div>
+
+										<!-- モーダルの本文 -->
+										<div class="modal-body text-start">
+											<p class="mb-0 small text-secondary">以下のカテゴリを完全に削除しますか？この操作は取り消せません。
+											</p>
+											<p class="fw-bold text-dark" th:text="${category.name}"></p>
+										</div>
+
+										<!-- モーダルのフッター -->
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary btn-sm rounded-pill px-3"
+												data-bs-dismiss="modal">キャンセル</button>
+
+											<form
+												th:action="@{/admin/categories/{categoryId}/delete(categoryId=${category.id})}"
+												method="post">
+												<button type="submit"
+													class="btn btn-dark btn-sm rounded-pill px-3">本当に削除する</button>
+											</form>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</th:block>
+					</div>
+				</div>
+
+				<!-- 会員データが空の場合 -->
+				<div th:if="${categories.isEmpty()}" class="card shadow-sm border-0 bg-white mb-4">
+					<div class="card-body p-5 text-center">
+						<p class="text-secondary mb-0 small lh-base">該当するカテゴリが見つかりませんでした。</p>
+					</div>
+				</div>
+
+			</div>
+	</div>
+	</main>
+	<!-- フッター部品（footer）を呼び出す -->
+	<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

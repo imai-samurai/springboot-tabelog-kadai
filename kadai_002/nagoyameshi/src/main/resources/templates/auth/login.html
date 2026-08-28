@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- スタイル部品を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>ログイン - NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-5 pb-5 nagoyameshi-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+
+						<!-- メッセージ表示 -->
+						<div th:if="${successMessage}" class="alert alert-info">
+							<span th:text="${successMessage}"></span>
+						</div>
+
+						<div th:if="${errorMessage}" class="alert alert-danger">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+						<h2 class="mb-4 text-center fw-bold text-dark">ログイン</h2>
+
+						<!-- ログイン失敗時のエラーメッセージ表示エリア -->
+						<div th:if="${param.error}" class="alert alert-danger" role="alert">
+							メールアドレスまたはパスワードが正しくありません。
+						</div>
+
+						<!-- ログインフォーム -->
+						<form th:action="@{/login}" method="post">
+
+							<!-- メールアドレス入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="email" class="col-form-label text-md-left fw-bold small">
+										メールアドレス
+									</label>
+								</div>
+								<div class="col-md-7">
+									<input type="text" class="form-control rounded" id="email" name="username"
+										autocomplete="email" placeholder="nagoya@example.com" required autofocus>
+								</div>
+							</div>
+
+							<!-- パスワード入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="password" class="col-form-label text-md-left fw-bold small">
+										パスワード
+									</label>
+								</div>
+								<div class="col-md-7">
+									<input type="password" class="form-control rounded" id="password" name="password"
+										autocomplete="current-password" placeholder="パスワード" required>
+								</div>
+							</div>
+
+							<!-- ログインボタン -->
+							<div class="form-group d-flex justify-content-center mt-5 my-4">
+								<button type="submit" class="btn btn-dark shadow-sm w-100 rounded fw-bold">ログイン</button>
+							</div>
+						</form>
+
+						<!-- 案内リンク -->
+						<div class="text-center">
+							<a th:href="@{/signup}" class="text-muted small">まだ会員登録がお済みでない方はこちら</a>
+						</div>
+						<div class="text-center">
+							<a th:href="@{/login/passreset}" class="text-muted small">パスワードをお忘れの方はこちら</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- JavaScript部品を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

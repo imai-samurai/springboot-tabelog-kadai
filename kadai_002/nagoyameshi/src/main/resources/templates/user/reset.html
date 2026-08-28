@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- スタイル部品を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-5 pb-5 nagoyameshi-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+
+						<h2 class="mb-4 text-center fw-bold text-dark">パスワードの変更</h2>
+
+						<!-- エラーメッセージ -->
+						<div th:if="${errorMessage}" class="alert alert-danger shadow-sm rounded-3 mb-4" role="alert">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+						<form method="post" th:action="@{/login/passreset/update}">
+
+							<!-- パスワード入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="password" class="col-form-label text-md-left fw-bold small">
+										<div class="d-flex align-items-center">
+											<span class="me-1">パスワード</span>
+										</div>
+									</label>
+								</div>
+								<div class="col-md-7">
+									<input type="password" id="password" name="password" class="form-control rounded"
+										required>
+								</div>
+							</div>
+
+							<!-- パスワード(確認用)入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="passwordConfirmation" class="col-form-label text-md-left fw-bold small">
+										<div class="d-flex align-items-center">
+											<span class="me-1">パスワード(確認用)</span>
+										</div>
+									</label>
+								</div>
+								<div class="col-md-7">
+									<input type="password" id="passwordConfirmation" name="passwordConfirmation"
+										class="form-control rounded" required>
+								</div>
+							</div>
+
+							<input type="hidden" name="token" th:value="${token}">
+
+							<!-- 変更ボタン -->
+							<div class="form-group d-flex justify-content-center mt-5 my-4">
+								<button type="submit"
+									class="btn btn-dark px-4 shadow-sm rounded-pill fw-bold">変更</button>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター部品を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- JavaScript部品を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

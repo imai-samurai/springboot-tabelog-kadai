@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI ADMIN</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<div th:if="${successMessage}" class="alert alert-info text-center mb-4">
+					<span th:text="${successMessage}"></span>
+				</div>
+
+				<h2 class="fw-bold mb-4 text-dark text-center">管理者ホーム</h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- 集計情報カード -->
+						<div class="card p-4 border-0 shadow-sm mb-4">
+							<table class="table table-borderless align-middle mb-0">
+								<!-- 総会員数 -->
+								<tr class="border-bottom">
+									<th class="text-muted" style="width: 40%;">総会員数</th>
+									<td class="fw-bold text-end" th:text="${totalUser} + ' 名'">0 名</td>
+								</tr>
+
+								<!-- 無料会員数 -->
+								<tr class="border-bottom">
+									<th class="text-muted ps-3">┗ 無料会員数</th>
+									<td class="text-end" th:text="${freeUser} + ' 名'">0 名</td>
+								</tr>
+
+								<!-- 有料会員数 -->
+								<tr class="border-bottom">
+									<th class="text-muted ps-3">┗ 有料会員数</th>
+									<td class="text-end" th:text="${puremiumUser} + ' 名'">0 名</td>
+								</tr>
+
+								<!-- 登録店舗数 -->
+								<tr class="border-bottom">
+									<th class="text-muted">登録店舗数</th>
+									<td class="fw-bold text-end" th:text="${totalStore} + ' 店舗'">0 店舗</td>
+								</tr>
+
+								<!-- 当月売上 -->
+								<tr>
+									<th class="text-muted">当月売上</th>
+									<td class="fw-bold text-end text-danger"
+										th:text="${#numbers.formatInteger(totalSales, 1, 'COMMA')} + ' 円'">0 円</td>
+								</tr>
+							</table>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

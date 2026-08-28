@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- リダイレクト時のメッセージ -->
+				<div th:if="${successMessage}" class="alert alert-info text-center mb-4">
+					<span th:text="${successMessage}">ユーザー情報を編集しました。</span>
+				</div>
+
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center">会員情報</h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- 会員情報 -->
+						<div class="card p-4 border-0 shadow-sm mb-4">
+							<table class="table table-borderless align-middle mb-0">
+								<!-- 名前 -->
+								<tr>
+									<th class="text-muted" style="width: 30%;">お名前</th>
+									<td class="fw-bold" th:text="${user.name}">名古屋 太郎</td>
+								</tr>
+
+								<!-- フリガナ -->
+								<tr>
+									<th class="text-muted">フリガナ</th>
+									<td th:text="${user.furi}">ナゴヤ タロウ</td>
+								</tr>
+
+								<!-- メールアドレス -->
+								<tr>
+									<th class="text-muted">メールアドレス</th>
+									<td th:text="${user.email}">nagoya@example.com</td>
+								</tr>
+							</table>
+						</div>
+
+						<!-- 編集ボタン -->
+						<div class="d-flex justify-content-center">
+							<a th:href="@{/user/edit}"
+								class="btn btn-dark btn-sm px-4 rounded-pill shadow-sm fw-bold">会員情報を編集する</a>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

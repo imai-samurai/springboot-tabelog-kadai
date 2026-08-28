@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center" th:text="|${store.name}を予約|"></h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- 投稿用フォーム -->
+						<div class="card border-0 shadow-sm">
+							<div class="card-body p-4 p-md-5">
+
+								<!-- フォームの設定 -->
+								<form method="post" th:action="@{/stores/__${store.id}__/reservations/create}"
+									th:object="${reservationRegisterForm}"
+									th:onsubmit="return confirm('入力された日時・人数で予約を確定します。よろしいですか？');">
+
+									<!-- 来店日 -->
+									<div class="mb-4">
+										<label for="reservationDate" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>来店日
+										</label>
+
+										<input type="date" id="reservationDate" class="form-control"
+											th:field="*{reservationDate}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('reservationDate')}"
+											th:errors="*{reservationDate}" class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 来店時間 -->
+									<div class="mb-4">
+										<label for="reservationTime" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>来店時間
+										</label>
+
+										<input type="time" id="reservationTime" class="form-control"
+											th:field="*{reservationTime}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('reservationTime')}"
+											th:errors="*{reservationTime}" class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 予約人数 -->
+									<div class="mb-4">
+										<label for="numberOfPeople" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2"
+												style="font-size: 0.75rem;">必須</span>予約人数（名）
+										</label>
+
+										<input type="number" id="numberOfPeople" class="form-control" min="1"
+											th:field="*{numberOfPeople}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('numberOfPeople')}"
+											th:errors="*{numberOfPeople}" class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 予約ボタン -->
+									<div class="form-group d-flex justify-content-center border-top pt-4">
+										<button type="submit"
+											class="btn btn-dark text-white shadow-sm w-50">予約する</button>
+									</div>
+								</form>
+
+							</div>
+						</div>
+
+					</div>　<!-- 全体配置の閉じタグ -->
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI ADMIN</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- 店舗名 -->
+				<h2 class="fw-bold mb-4 text-dark text-center" th:text="${store.name}">管理者 店舗詳細</h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- メイン画像 -->
+						<div class="mb-4">
+							<img th:if="${store.imageName != null}" th:src="@{/storage/__${store.imageName}__}"
+								class="w-100 rounded shadow-sm" alt="店舗画像"
+								style="max-height: 400px; object-fit: cover;">
+							<img th:unless="${store.imageName != null}" th:src="@{/images/no-image.jpg}"
+								class="w-100 rounded shadow-sm" alt="No Image"
+								style="max-height: 400px; object-fit: cover;">
+						</div>
+
+						<!-- 詳細情報テーブル -->
+						<div class="mb-4">
+							<table class="table table-bordered shadow-sm bg-white align-middle">
+								<tbody>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small"
+											style="width: 25%;">価格帯</th>
+										<td
+											th:text="${#numbers.formatInteger(store.priceLower, 1, 'COMMA')} + '円 〜 ' + ${#numbers.formatInteger(store.priceUpper, 1, 'COMMA')} + '円'">
+											1,000円 〜 3,000円</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">営業時間</th>
+										<td
+											th:text="${#temporals.format(store.hoursOpen, 'HH:mm')} + ' 〜 ' + ${#temporals.format(store.hoursClose, 'HH:mm')}">
+											17:00 〜 23:00</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">定休日</th>
+										<td th:text="${store.regularHoliday}">火曜日</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">郵便番号</th>
+										<td th:text="'〒' + ${store.postalCode}">〒460-0008</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">住所</th>
+										<td th:text="${store.address}">愛知県名古屋市...</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">電話番号</th>
+										<td th:text="${store.phoneNumber}">052-123-4567</td>
+									</tr>
+									<tr>
+										<th class="table-light text-secondary fw-bold text-center small">店舗説明</th>
+										<td th:text="${store.description}">店舗の説明文</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- 店舗編集ボタン -->
+						<div class="text-center mb-4">
+							<a th:href="@{/admin/stores/{storeId}/edit(storeId=${store.id})}"
+								class="btn btn-dark btn-sm px-4 rounded-pill shadow-sm fw-bold">店舗情報を編集する</a>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

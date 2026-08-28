@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI ADMIN</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- 店舗名 -->
+				<h2 class="fw-bold mb-4 text-dark text-center">ユーザー一覧</h2>
+
+				<!-- 店舗名キーワード検索窓 -->
+				<div class="row mb-4 justify-content-start">
+					<div class="col-md-5">
+						<form method="get" th:action="@{/admin/users}">
+							<div class="input-group input-group-lg shadow-sm rounded">
+								<input type="text" name="keyword" th:value="${keyword}"
+									class="form-control border-0 px-3 text-dark" placeholder="アドレスを検索">
+								<button class="btn btn-dark border-0 px-3" type="submit">検索</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="row justify-content-center">
+
+					<!-- 会員データが空ではない場合 -->
+					<div th:unless="${userPage.isEmpty()}" class="table-responsive bg-white rounded shadow-sm p-4 mb-4">
+						<table class="table table-hover align-middle">
+							<thead class="table-light">
+								<tr class="text-dark">
+									<th scope="col" class="fw-bold small">ID</th>
+									<th scope="col" class="fw-bold small">氏名</th>
+									<th scope="col" class="fw-bold small">フリガナ</th>
+									<th scope="col" class="fw-bold small">メールアドレス</th>
+									<th scope="col" class="fw-bold small">ステータス</th>
+									<th scope="col" class="fw-bold small">登録日</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="user : ${userPage.content}" class="text-secondary small">
+									<!-- ID -->
+									<td th:text="${user.id}" class="fw-bold text-dark">1</td>
+
+									<!-- 氏名 -->
+									<td th:text="${user.name}" class="text-dark">侍 太郎</td>
+
+									<!-- フリガナ -->
+									<td th:text="${user.furi}">サムライ タロウ</td>
+
+									<!-- メールアドレス -->
+									<td th:text="${user.email}">samurai@example.com</td>
+
+									<!-- 会員ステータス -->
+									<td>
+										<!-- 有料会員（role_idが2の場合） -->
+										<span th:if="${user.role.id == 2}"
+											class="badge bg-dark rounded-pill px-2 py-1">有料会員</span>
+										<!-- 無料会員（role_idが1の場合） -->
+										<span th:if="${user.role.id == 1}"
+											class="badge bg-secondary opacity-75 rounded-pill px-2 py-1">無料会員</span>
+									</td>
+
+									<!-- 登録日 -->
+									<td th:text="${#dates.format(user.createdAt, 'yyyy年MM月dd日')}">2026年01/01日</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<!-- 会員データが空の場合 -->
+					<div th:if="${userPage.isEmpty()}" class="card shadow-sm border-0 bg-white mb-4">
+						<div class="card-body p-5 text-center">
+							<p class="text-secondary mb-0 small lh-base">該当する会員情報が見つかりませんでした。</p>
+						</div>
+					</div>
+
+
+					<!-- ページネーション -->
+					<div th:if="${userPage.getTotalPages() > 1}" class="d-flex justify-content-center mt-4">
+						<nav aria-label="レビュー 一覧ページ">
+							<ul class="pagination">
+
+								<!-- 「前」への戻るボタン -->
+								<li class="page-item">
+									<span th:if="${userPage.isFirst()}"
+										class="page-link disabled text-muted border-0">前</span>
+									<a th:unless="${userPage.isFirst()}"
+										th:href="@{/admin/users(page=${userPage.getNumber() - 1}, keyword = ${keyword})}"
+										class="page-link btn-dark border-0">前</a>
+								</li>
+
+								<!-- 各ページ移動 -->
+								<li th:each="i : ${#numbers.sequence(0, userPage.getTotalPages() - 1)}"
+									class="page-item mx-1">
+									<!-- 現在アクティブなページ番号 -->
+									<span th:if="${i == userPage.getNumber()}"
+										class="page-link bg-dark text-white border-0 rounded"
+										th:text="${i + 1}">1</span>
+									<!-- それ以外のページ番号へのリンク -->
+									<a th:unless="${i == userPage.getNumber()}"
+										th:href="@{/admin/users(page = ${i}, keyword = ${keyword})}"
+										class="page-link text-dark border-0 rounded" th:text="${i + 1}">2</a>
+								</li>
+
+								<!-- 「次」への進むボタン -->
+								<li class="page-item">
+									<span th:if="${userPage.isLast()}"
+										class="page-link disabled text-muted border-0">次</span>
+									<a th:unless="${userPage.isLast()}"
+										th:href="@{/admin/users(page=${userPage.getNumber() + 1}, keyword = ${keyword})}"
+										class="page-link btn-dark border-0">次</a>
+								</li>
+							</ul>
+						</nav>
+					</div> <!-- ページネーション閉じタグ -->
+
+
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

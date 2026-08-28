@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- スタイル部品を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>会員登録 - NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-5 pb-5 nagoyameshi-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-7 col-lg-9 col-md-11">
+
+						<div th:if="${successMessage}" class="alert alert-info">
+							<span th:text="${successMessage}"></span>
+						</div>
+
+						<div th:if="${errorMessage}" class="alert alert-danger">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+						<h2 class="mb-4 text-center fw-bold text-dark">サブスクリプション登録</h2>
+
+						<div class="card shadow-sm border-0">
+							<div class="fs-4 fw-bold mb-3 text-dark text-center">有料プランの内容</div>
+							<ul class="fs-5 text-muted list-unstyled">
+								<li class="border-bottom pb-2 pt-2 ps-2">店舗の簡単なオンラインネット予約機能</li>
+								<li class="border-bottom pb-2 pt-2 ps-2">お気に入り店舗の保存・一覧表示機能</li>
+								<li class="border-bottom pb-2 pt-2 ps-2">店舗へのおすすめレビュー投稿・編集機能</li>
+								<li class="border-bottom pb-2 pt-2 ps-2">月額300円</li>
+							</ul>
+						</div>
+						<form method="post" th:action="@{/subscription/register/create}">
+							<button type="submit"
+								class="btn btn-dark shadow-sm w-100 rounded fw-bold">クレジットカードで支払う</button>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター部品を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- JavaScript部品を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

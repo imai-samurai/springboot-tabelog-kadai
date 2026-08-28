@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<!-- meta要素の部品（meta）を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+	<!-- Bootstrapなどのスタイル部品（styles）を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI ADMIN</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー部品（header）を呼び出す -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container nagoyameshi-container pb-5 pt-4">
+
+				<!-- 見出し -->
+				<h2 class="fw-bold mb-4 text-dark text-center">新規店舗を登録する</h2>
+
+				<div class="row justify-content-center">
+					<div class="col-xl-9 col-lg-10">
+
+						<!-- 投稿用フォーム -->
+						<div class="card border-0 shadow-sm">
+							<div class="card-body p-4 p-md-5">
+
+								<!-- フォームの設定 -->
+								<form method="post" th:action="@{/admin/stores/create}"
+									th:object="${adminStoreRegisterForm}" enctype="multipart/form-data">
+
+									<!-- 店舗の写真 -->
+									<div class="mb-4">
+										<label for="imageFile" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2"
+												style="font-size: 0.75rem;">必須</span>店舗の写真
+										</label>
+
+										<input type="file" id="imageFile" class="form-control" th:field="*{imageFile}"
+											th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('imageFile')}" th:errors="*{imageFile}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- カテゴリ -->
+									<div class="mb-4">
+										<label class="form-label fw-bold" style="color: #4a3c31;">カテゴリ</label>
+										<div class="d-flex flex-wrap gap-3">
+
+											<th:block th:each="category : ${categories}">
+												<div class="form-check">
+													<input type="checkbox" th:id="${#ids.seq('categoryIds')}"
+														class="form-check-input" th:field="*{categoryIds}"
+														th:value="${category.id}">
+
+													<label th:for="${#ids.prev('categoryIds')}"
+														th:text="${category.name}"
+														class="form-check-label text-dark small">カテゴリ名</label>
+												</div>
+											</th:block>
+										</div>
+
+										<div th:if="${#fields.hasErrors('categoryIds')}" th:errors="*{categoryIds}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 店舗名 -->
+									<div class="mb-4">
+										<label for="name" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>店舗名
+										</label>
+
+										<input type="text" id="name" class="form-control" th:field="*{name}"
+											th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 説明文 -->
+									<div class="mb-4">
+										<label for="description" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>説明文
+										</label>
+
+										<textarea id="description" class="form-control" th:field="*{description}"
+											th:errorclass="is-invalid"></textarea>
+
+										<div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 価格帯(上限) -->
+									<div class="mb-4">
+										<label for="priceUpper" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2"
+												style="font-size: 0.75rem;">必須</span>価格帯(上限)
+										</label>
+
+										<input type="number" id="priceUpper" class="form-control"
+											th:field="*{priceUpper}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('priceUpper')}" th:errors="*{priceUpper}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 価格帯(下限) -->
+									<div class="mb-4">
+										<label for="priceLower" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2"
+												style="font-size: 0.75rem;">必須</span>価格帯(下限)
+										</label>
+
+										<input type="number" id="priceLower" class="form-control"
+											th:field="*{priceLower}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('priceLower')}" th:errors="*{priceLower}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 開店時間 -->
+									<div class="mb-4">
+										<label for="hoursOpen" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>開店時間
+										</label>
+
+										<input type="time" id="hoursOpen" class="form-control" th:field="*{hoursOpen}"
+											th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('hoursOpen')}" th:errors="*{hoursOpen}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 閉店時間 -->
+									<div class="mb-4">
+										<label for="hoursClose" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>閉店時間
+										</label>
+
+										<input type="time" id="hoursClose" class="form-control" th:field="*{hoursClose}"
+											th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('hoursClose')}" th:errors="*{hoursClose}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 郵便番号 -->
+									<div class="mb-4">
+										<label for="postalCode" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>郵便番号
+										</label>
+
+										<input type="text" id="postalCode" class="form-control" th:field="*{postalCode}"
+											th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('postalCode')}" th:errors="*{postalCode}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 住所 -->
+									<div class="mb-4">
+										<label for="address" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>住所
+										</label>
+
+										<input type="text" id="address" class="form-control" th:field="*{address}"
+											th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('address')}" th:errors="*{address}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 電話番号 -->
+									<div class="mb-4">
+										<label for="phoneNumber" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>電話番号
+										</label>
+
+										<input type="text" id="phoneNumber" class="form-control"
+											th:field="*{phoneNumber}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"
+											class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 定休日 -->
+									<div class="mb-4">
+										<label for="regularHoliday" class="form-label fw-bold" style="color: #4a3c31;">
+											<span class="badge bg-danger me-2" style="font-size: 0.75rem;">必須</span>定休日
+										</label>
+
+										<input type="text" id="regularHoliday" class="form-control"
+											th:field="*{regularHoliday}" th:errorclass="is-invalid">
+
+										<div th:if="${#fields.hasErrors('regularHoliday')}"
+											th:errors="*{regularHoliday}" class="invalid-feedback fw-bold"></div>
+									</div>
+
+									<!-- 投稿ボタン -->
+									<div class="form-group d-flex justify-content-center border-top pt-4">
+										<button type="submit"
+											class="btn btn-dark text-white shadow-sm w-50">新規登録する</button>
+									</div>
+								</form>
+
+							</div>
+						</div>
+
+					</div>　<!-- 全体配置の閉じタグ -->
+				</div>
+			</div>
+		</main>
+		<!-- フッター部品（footer）を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+	<!-- BootstrapのJavaScript部品（scripts）を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

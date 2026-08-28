@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<!-- meta要素の部品を呼び出す -->
+	<div th:replace="~{fragment :: meta}"></div>
+
+	<!-- スタイル部品を呼び出す -->
+	<div th:replace="~{fragment :: styles}"></div>
+
+	<title>NAGOYAMESHI</title>
+</head>
+
+<body>
+	<div class="nagoyameshi-wrapper">
+		<!-- ヘッダー -->
+		<div th:replace="~{fragment :: header}"></div>
+
+		<main>
+			<div class="container pt-5 pb-5 nagoyameshi-container">
+				<div class="row justify-content-center">
+					<div class="col-xl-5 col-lg-6 col-md-8">
+
+						<h2 class="mb-4 text-center fw-bold text-dark">メールアドレスの確認</h2>
+
+						<!-- エラーメッセージ -->
+						<div th:if="${errorMessage}" class="alert alert-danger shadow-sm rounded-3 mb-4" role="alert">
+							<span th:text="${errorMessage}"></span>
+						</div>
+
+						<form method="post" th:action="@{/login/passreset}">
+
+							<!-- メールアドレス入力欄 -->
+							<div class="form-group row mb-3 text-dark">
+								<div class="col-md-5">
+									<label for="email" class="col-form-label text-md-left fw-bold small">
+										<div class="d-flex align-items-center">
+											<span class="me-1">メールアドレス</span>
+										</div>
+									</label>
+								</div>
+								<div class="col-md-7">
+									<input type="text" id="email" name="email" class="form-control rounded"
+										placeholder="example@nagoyameshi.com" required autocomplete="email">
+								</div>
+							</div>
+
+							<!-- 編集ボタン -->
+							<div class="form-group d-flex justify-content-center mt-5 my-4">
+								<button type="submit"
+									class="btn btn-dark px-4 shadow-sm rounded-pill fw-bold">送信</button>
+							</div>
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- フッター部品を呼び出す -->
+		<div th:replace="~{fragment :: footer}"></div>
+	</div>
+
+	<!-- JavaScript部品を呼び出す -->
+	<div th:replace="~{fragment :: scripts}"></div>
+</body>
+
+</html>

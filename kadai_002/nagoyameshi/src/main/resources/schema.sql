@@ -1,0 +1,124 @@
+-- 1. ロール（roles）マスターテーブル
+CREATE TABLE IF NOT EXISTS roles (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR (50) NOT NULL
+);
+
+-- 2. 会員情報（users）テーブル
+CREATE TABLE IF NOT EXISTS users (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   role_id INT NOT NULL,
+   name VARCHAR (50) NOT NULL,
+   furi VARCHAR (50) NOT NULL,
+   email VARCHAR (255) NOT NULL UNIQUE,
+   password VARCHAR (255) NOT NULL,
+   stripe_customer_id VARCHAR (255),
+   enabled BOOLEAN NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   FOREIGN KEY (role_id) REFERENCES roles (id)
+);
+
+-- 3. メール認証用トークン（verification_tokens）テーブル
+CREATE TABLE IF NOT EXISTS verification_tokens (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   user_id INT NOT NULL UNIQUE,
+   token VARCHAR (255) NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- 4. 管理者情報（admins）テーブル
+CREATE TABLE IF NOT EXISTS admins (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   email VARCHAR (255) NOT NULL UNIQUE,
+   password VARCHAR (255) NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 5. カテゴリ（categories）テーブル
+CREATE TABLE IF NOT EXISTS categories (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR (50) NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 6. 店舗情報（stores）テーブル
+CREATE TABLE IF NOT EXISTS stores (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR (50) NOT NULL,
+   image_name VARCHAR (255),
+   description VARCHAR (255) NOT NULL,
+   price_upper INT NOT NULL,
+   price_lower INT NOT NULL,
+   hours_open TIME NOT NULL,
+   hours_close TIME NOT NULL,
+   postal_code VARCHAR (50) NOT NULL,
+   address VARCHAR (255) NOT NULL,
+   phone_number VARCHAR (50) NOT NULL,
+   regular_holiday VARCHAR (50) NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 6.5 店舗とカテゴリの中間テーブル（ここに2つの外部キーを集中させます）
+CREATE TABLE IF NOT EXISTS store_category (
+   store_id INT NOT NULL,
+   category_id INT NOT NULL,
+   PRIMARY KEY (store_id, category_id),
+   -- 外部キー1：storesテーブルのidと結びつける
+   FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE,
+   -- 外部キー2：categoriesテーブルのidと結びつける
+   FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
+);
+
+-- 7. 予約（reservations）テーブル
+CREATE TABLE IF NOT EXISTS reservations (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   user_id INT NOT NULL,
+   store_id INT NOT NULL,
+   reservation_date DATE NOT NULL,
+   reservation_time TIME NOT NULL,
+   number_of_people INT NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+   FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE
+);
+
+-- 8. レビュー（reviews）テーブル
+CREATE TABLE IF NOT EXISTS reviews (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   store_id INT NOT NULL,
+   user_id INT NOT NULL,
+   score INT NOT NULL,
+   comment TEXT NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE,
+   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- 9. お気に入り（favorites）テーブル
+CREATE TABLE IF NOT EXISTS favorites (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   store_id INT NOT NULL,
+   user_id INT NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   UNIQUE KEY unique_store_user (store_id, user_id),
+   FOREIGN KEY (store_id) REFERENCES stores (id) ON DELETE CASCADE,
+   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- 10. パスワードリセット用トークン（password_reset_tokens）テーブル
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   user_id INT NOT NULL UNIQUE,
+   token VARCHAR (255) NOT NULL,
+   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
